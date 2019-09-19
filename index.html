@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Projet RO</title>
+	<style type="text/css">
+		#stl{
+			border: 0px;
+		}
+		input {
+    		width: 45px;
+    		text-align: center;
+    		background-color: white;
+    		color: black;
+    		border: 1px solid grey;
+		}
+		.col-md-2{
+			text-align:center;
+			color:black;
+			margin-top:5px;
+		}
+		.col-md-8{
+			background-color: white;
+		}
+		.title{
+			background-color: green;
+			border:1px solid black;
+		}
+	</style>
+	
+</head>
+<body>
+	
+	<div style="padding:10px;border:1px solid grey;">
+		<div style="text-align:center; margin-top:10px">
+			<input type="number" style="width:150px;" placeholder="ligne" id="ligne" >
+  			<input type="number" style="width:150px;" placeholder="colone" id="colone">
+  			<input type="button" id="ok" style="width:150px;" value="OK" onclick="tabledinam(); hide('ligne'); hide('colone'); hide('ok'); show('dd'); show('save')">
+			<input type="button" id="dd" style="width:150px;display:none" value="Default data" onclick="defaultDATA(); hide('dd')">
+			<input type="button" id="save" style="width:150px;display:none" value="Save" onclick="save(); show('resolve'); ">
+			<input type="button" id="resolve" style="width:150px;display:none;" value="Resolve" onclick="resolver()">
+		</div>
+		<div id="content" style="display:block; text-align:center;margin:50px;">
+			<div id="content1" style="display:inline-block">
+			</div>	    	
+		</div>
+
+		<div id="output" style="text-align:center;">
+
+		</div>
+	</div>
+	
+
+  	<script>
+		let table = '';
+		let rows;
+		let cols;
+		let DT = [
+			[0, 1, 0, 1],
+			[0, 1, 1, 0],
+			[0, 9, 0, 0]
+			];
+		
+		let mat = new Array();
+		let mety=new Array();
+		let deja=new Array();
+
+		function tabledinam() {
+			//Creer table, entrer valeur
+			rows = document.getElementById("ligne").value;
+			cols = document.getElementById("colone").value;
+			let i = 0;
+			
+			table += '';
+			for (let r = 0; r < rows; r++) {
+				table += '<tr>';
+				for (let c = 0; c < cols; c++) {	
+					table += '<td>' + '<input type="number" style="width: 45px;text-align: center;background-color: white;color: black;border: 1px solid grey;" id="' + i + '" >' + '</td>';
+					i++;
+				}
+				table += '</tr>';
+			}
+			document.querySelector("#content1").innerHTML = '<div style="display:block;"><div style="display:inline-block;"><table id="table">' + table + '</table></div>';
+				
+		}
+
+		
+		function defaultDATA() {
+			if (rows == 3 && cols == 3) {
+				tab = document.getElementById("table");
+				//remplire taleau
+				for (let r = 0; r < rows; r++) {
+					for (c = 0; c < cols; c++) {
+						tab.rows[r].cells[c].children[0].value = DT[r][c];
+					}
+				}
+			}
+		}
+
+		function hide(id) {
+			document.getElementById(id).style.display = 'none';
+		}
+
+		function show(id) {
+			document.getElementById(id).style.display = '';
+		}
+
+		function save() {
+
+			tab = document.getElementById("table");
+			for (let r = 0; r < rows; r++) {
+				mat[r] = new Array();
+				for (c = 0; c < cols; c++) {
+					let f = tab.rows[r].cells[c].children[0].value;
+					mat[r][c] = f;
+				}
+			}
+
+		}
+
+		function resolver(){
+			let defaultCell={val:0,x:0,y:0,name:'(0,0)'}
+			let defaultTree=new Object();
+			defaultTree.cell=defaultCell;
+			deja=[defaultCell];
+			mety=[];
+			courte(defaultTree);
+			console.log(deja)
+			console.log(mety)
+			if(mety.length>0)
+				document.querySelector("#output").textContent='Output: '+affiche(avadika(meilleur()));
+			else
+				document.querySelector("#output").textContent='Output: ';
+		}
+
+		function courte(arbre){
+			const dx=arbre.cell.x;
+			const dy=arbre.cell.y;
+			const dval=arbre.cell.val;
+			const nname='('+dx+','+dy+')';
+			
+			let cl={val:dval,x:dx,y:dy,name:nname};
+			if(cl.x!=(rows-1)){
+				let nx=new Object();
+				nx.cell=nextX(cl);
+				if((nextX(cl).val==0 || nextX(cl).val==9) && !isDeja(nextX(cl))){
+
+					arbre.nx=nx;
+					nx.parent=arbre;
+					deja.push(nextX(cl));
+				}
+			}
+			cl={val:dval,x:dx,y:dy,name:nname};
+			if(cl.y!=(cols-1)){
+				let ny=new Object();
+				ny.cell=nextY(cl);
+				if((nextY(cl).val==0 || nextY(cl).val==9) && !isDeja(nextY(cl))){
+					arbre.ny=ny;
+					ny.parent=arbre;
+					deja.push(nextY(cl));
+				}
+			}
+			cl={val:dval,x:dx,y:dy,name:nname};
+			if(cl.x!=0){
+				let px=new Object();
+				px.cell=previousX(cl);
+				if((previousX(cl).val==0 || previousX(cl).val==9) && !isDeja(previousX(cl))){
+					arbre.px=px;
+					px.parent=arbre;
+					deja.push(previousX(cl));
+				}
+			}
+			cl={val:dval,x:dx,y:dy,name:nname};
+			if(cl.y!=0){
+				let py=new Object();
+				py.cell=previousY(cl);
+				if((previousY(cl).val==0 || previousY(cl).val==9) && !isDeja(previousY(cl))){
+					arbre.py=py;
+					py.parent=arbre;
+					deja.push(previousY(cl));
+				}
+			}
+			console.log(arbre);
+			if(arbre.nx!=null){
+				if(arbre.cell.val==9){
+					mety.push(arbre);
+				}else{
+					courte(arbre.nx)
+				}
+			}
+			if(arbre.ny!=null){
+				if(arbre.cell.val==9){
+					mety.push(arbre);
+				}else{
+					courte(arbre.ny)
+				}
+			}
+			if(arbre.px!=null){
+				if(arbre.cell.val==9){
+					mety.push(arbre);
+				}else{
+					courte(arbre.px)
+				}
+			}
+			if(arbre.py!=null){
+				if(arbre.cell.val==9){
+					mety.push(arbre);
+				}else{
+					courte(arbre.py)
+				}
+			}
+			
+			
+		}
+
+		function nextX(cell){
+			tab = document.getElementById("table");
+			let nCell=new Object();
+			if(cell.x!=(rows-1)){
+				nCell.val=parseInt(tab.rows[(cell.x+1)].cells[(cell.y)].children[0].value);
+				nCell.x=(cell.x+1);
+				nCell.y=cell.y;
+				nCell.name='('+nCell.x+','+nCell.y+')';
+				return nCell;
+			}
+			return null;
+		}
+
+		function nextY(cell){
+			tab = document.getElementById("table");
+			let nCell=new Object();
+			if(cell.y!=(cols-1)){
+				nCell.val=parseInt(tab.rows[(cell.x)].cells[(cell.y+1)].children[0].value);
+				nCell.x=cell.x;
+				nCell.y=cell.y+1;
+				nCell.name='('+nCell.x+','+nCell.y+')';
+				return nCell;
+			}
+			return null;
+		}
+
+		function previousX(cell){
+			tab = document.getElementById("table");
+			let nCell=new Object();
+			if(cell.x!=0){
+				nCell.val=parseInt(tab.rows[(cell.x-1)].cells[(cell.y)].children[0].value);
+				nCell.x=(cell.x-1);
+				nCell.y=cell.y;
+				nCell.name='('+nCell.x+','+nCell.y+')';
+				return nCell;
+			}
+			return null;
+		}
+
+		function previousY(cell){
+			tab = document.getElementById("table");
+			let nCell=new Object();
+			if(cell.y!=0){
+				nCell.val=parseInt(tab.rows[(cell.x)].cells[(cell.y-1)].children[0].value);
+				nCell.x=cell.x;
+				nCell.y=cell.y-1;
+				nCell.name='('+nCell.x+','+nCell.y+')';
+				return nCell;
+			}
+			return null;
+		}
+
+
+		function isDeja(v){
+			const cd = v;
+		    let ok = false;
+		    if(parseInt(cd.val)!=9){
+		    	for (var i = 0; i < deja.length; i++) {
+		    		if (deja[i].x == cd.x && deja[i].y == cd.y) {
+			            ok = true
+			        }
+		    	}
+		    }
+		    return ok;
+		}
+
+		function avadika(m) {
+		    while (m.parent != null) {
+		        m.parent.ok = m;
+		        m = m.parent;
+		    }
+		    return m;
+		}
+
+		function nb(m) {
+		    let i = 0;
+		    while (m.parent != null) {
+		        i++;
+		        m = m.parent;
+		    }
+		    return i;
+		}
+
+		function meilleur(){
+			let meilleur=mety[0];
+			for (var i = 0; i < mety.length; i++) {
+				if(nb(meilleur)>nb(mety[i])){
+					meilleur=mety[i];
+				}
+			}
+			return meilleur;
+		}
+
+		function affiche(m){
+			if(m.ok!=null){
+				return m.cell.name+" "+affiche(m.ok);
+			}else{
+				return m.cell.name;
+			}
+		}
+
+	</script>
+</body>
+</html>
