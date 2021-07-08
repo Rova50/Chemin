@@ -74,9 +74,13 @@
 			table += '';
 			for (let r = 0; r < rows; r++) {
 				table += '<tr>';
-				for (let c = 0; c < cols; c++) {	
-					table += '<td>' + '<input type="number" style="width: 45px;text-align: center;background-color: white;color: black;border: 1px solid grey;" id="' + i + '" >' + '</td>';
-					i++;
+				for (let c = 0; c < cols; c++) {
+                    if(c==0 && r==0){
+                        table += '<td>' + '<input type="number" style="width: 45px;text-align: center;background-color: white;color: black;border: 1px solid grey;" value="0" id="' + i + '" >' + '</td>';
+                    }else{	
+					    table += '<td>' + '<input type="number" style="width: 45px;text-align: center;background-color: white;color: black;border: 1px solid grey;" id="' + i + '" >' + '</td>';
+                    }
+                    i++;
 				}
 				table += '</tr>';
 			}
@@ -125,8 +129,8 @@
 			deja=[defaultCell];
 			mety=[];
 			courte(defaultTree);
-			console.log(deja)
-			console.log(mety)
+			//console.log(deja)
+			//console.log(mety)
 			if(mety.length>0)
 				document.querySelector("#output").textContent='Output: '+affiche(avadika(meilleur()));
 			else
@@ -180,29 +184,28 @@
 					deja.push(previousY(cl));
 				}
 			}
-			console.log(arbre);
-			if(arbre.nx!=null){
+			if(arbre.nx!=null || arbre.cell.val==9){
 				if(arbre.cell.val==9){
 					mety.push(arbre);
 				}else{
 					courte(arbre.nx)
 				}
 			}
-			if(arbre.ny!=null){
+			if(arbre.ny!=null || arbre.cell.val==9){
 				if(arbre.cell.val==9){
 					mety.push(arbre);
 				}else{
 					courte(arbre.ny)
 				}
 			}
-			if(arbre.px!=null){
+			if(arbre.px!=null || arbre.cell.val==9){
 				if(arbre.cell.val==9){
 					mety.push(arbre);
 				}else{
 					courte(arbre.px)
 				}
 			}
-			if(arbre.py!=null){
+			if(arbre.py!=null || arbre.cell.val==9){
 				if(arbre.cell.val==9){
 					mety.push(arbre);
 				}else{
@@ -307,12 +310,16 @@
 		}
 
 		function affiche(m){
+            let table = document.getElementById("table");
 			if(m.ok!=null){
-				return m.cell.name+" "+affiche(m.ok);
+                table.rows[m.cell.x].cells[m.cell.y].children[0].style.backgroundColor="green";
+				return m.cell.name+" "+affiche(m.ok);  
 			}else{
+                table.rows[m.cell.x].cells[m.cell.y].children[0].style.backgroundColor="green";
 				return m.cell.name;
 			}
 		}
+
 
 	</script>
 </body>
