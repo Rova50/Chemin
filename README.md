@@ -1,5 +1,5 @@
 # Chemin
-There many case that show you about where to go.
+
 Ceci est un resolver 
 
 Elle consite à completer le tableau par la valeur 0,1 et 9
